@@ -8,6 +8,11 @@
     var resourceCache = {};
     var loading = [];
     var readyCallbacks = [];
+    const bgMusic = new Audio('soundfx/splash-HqL3mzLp2.mp3');
+    bgMusic.volume = .45;
+    bgMusic.loop = true;
+    bgMusic.autoplay = true;
+    bgMusic.play();
 
     /* This is the publicly accessible image loading function. It accepts
      * an array of strings pointing to image files or a string for a single
@@ -97,6 +102,7 @@
      */
     function onReady(func) {
         readyCallbacks.push(func);
+
     }
 
     /* This object defines the publicly accessible functions available to
