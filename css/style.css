@@ -39,7 +39,7 @@ body {
 .muted {
     width: 20%;
     height: auto;
-    background-image: url(/images/mute.png);
+    background-image: url(../images/mute.png);
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
@@ -49,7 +49,7 @@ body {
 .unmuted {
     width: 20%;
     height: auto;
-    background-image: url(/images/unmute.png);
+    background-image: url(../images/unmute.png);
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
