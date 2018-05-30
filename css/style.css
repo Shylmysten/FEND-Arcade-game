@@ -1,6 +1,8 @@
 body {
     text-align: center;
     font-size: 1em;
+    background: #191919;
+    color: white;
 }
 
 
@@ -13,25 +15,46 @@ body {
     right: 0;
     padding: 0;
     margin: 4px auto 0 auto;
+    font-size: 1.25em;
 }
 
 .health {
-    width: 50%;
+    width: 40%;
 }
 
 
 .score {
-    width: 50%;
+    width: 40%;
 }
 
 
 .hearts {
-    height: 6%;
-    width: 6%;
+    height: 9%;
+    width: 9%;
     padding: 3px 3px 0px 3px;
     justify-content: space-around;
 }
 
+
+.muted {
+    width: 20%;
+    height: auto;
+    background-image: url(/images/mute.png);
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    z-index: 100;
+}
+
+.unmuted {
+    width: 20%;
+    height: auto;
+    background-image: url(/images/unmute.png);
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    z-index: 100;
+}
 
 .modal {
     position: fixed;
@@ -45,6 +68,7 @@ body {
     z-index: 1001;
     width: 505px;
     display: none;
+    color: #000;
 }
 
 
@@ -70,7 +94,6 @@ h1 {
 
 button {
     background-color: #4CAF50;
-    /* Green */
     border: none;
     color: white;
     padding: 15px 32px;
@@ -81,7 +104,6 @@ button {
     margin: 4px 2px;
     cursor: pointer;
     -webkit-transition-duration: 0.4s;
-    /* Safari */
     transition-duration: 0.4s;
 }
 
@@ -95,4 +117,16 @@ button:hover {
     color: red;
     font-weight: bold;
     font-size: 1.5em;
+}
+
+
+/* Overrides of native classes in Sweetalert2 */
+
+.swal2-popup {
+    background: #FFEB3B !important;
+}
+
+
+.swal2-title {
+    color: #491a9d !important;
 }

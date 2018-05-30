@@ -17,10 +17,20 @@ const pScore = document.createElement('div');
 pScore.setAttribute('class', 'score');
 // now lets place a score of 000000 into a span with the id of 'score'
 pScore.innerHTML = '<p>SCORE:<span type="number" id="score">000000</span></p>';
+
+const sfxControls = document.createElement('div');
+sfxControls.setAttribute('class', 'muted');
+const bgMusic = new Audio('soundfx/splash-HqL3mzLp2.mp3');
+bgMusic.volume = .45;
+bgMusic.loop = true;
+
+
 // append the health div to the infobar div
 infoBar.appendChild(pHealth);
 // append the div that hold our score into the infoBar
 infoBar.appendChild(pScore);
+
+infoBar.appendChild(sfxControls);
 // now lets append the info bar to our body
 document.body.appendChild(infoBar);
 // select the span that hold our heart icons
@@ -31,24 +41,13 @@ const uiScore = document.getElementById('score');
 // Taking cues from the engine.js with updateEntities, let create a superClass
 // called entities which we will then subclass the player and enemies from
 class Entities {
+    // The super class from which all "entity" classes are based.
+    // Doesn't make a lot of sense, but the rubric said we had to build class
+    // and subclasses. Here is my superClass.
     constructor(x,y) {
-        // the image
-        this.sprite = '';
         // x and y coords
         this.x = x;
         this.y = y;
-
-        // offsets left inert transparent space in image itself
-        this.sx = 0;
-        // offsets top inert transparent space in image itself
-        this.sy = 0;
-
-        // actual width of sprite - inert transparencies (checkCollisions)
-        this.sWidth = 0;
-        // actual height of sprite - inert transparencies (checkCollisions)
-        this.sHeight = 0;
-        this.collisionSfx = new Audio('soundfx/cartoon-ouch-sound-effect-J0EbCeXN-clipped.mp3');
-        this.lvlUpSfx = new Audio('soundfx/woo_hoo.mp3');
     }
 
 }
@@ -58,6 +57,8 @@ Entities.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.sx, this.sy, this.sWidth, this.sHeight, this.x, this.y, this.sWidth, this.sHeight);
 }
 
+//@@ Prototypical method which provied logic for collisions between
+// Player and enemies
 Entities.prototype.checkCollisions = function(x,y) {
     allEnemies.forEach((enemy) => {
         // Player's left side
@@ -87,6 +88,7 @@ Entities.prototype.checkCollisions = function(x,y) {
             // if the player has no lives left
             if (livesLeft === 0) {
                 // GAME OVER display modal
+                bgMusic.pause();
                 // get and remove the low lives message displayed below canvas
                 document.querySelector('canvas').nextSibling.remove();
                 // hide the display while displaying the model
@@ -106,19 +108,24 @@ Entities.prototype.checkCollisions = function(x,y) {
                 // change the text of the header
                 header.innerHTML = `GAME OVER BUDDY!`;
                 // change the message body of the modal
-                message.innerHTML = `<p>You finished with a score of ${score}!</p><p>GREAT JOB!!!</p><p>How about another game?</p>`;
+                message.innerHTML = `<p>You reached <strong>Level ${this.lvl}</strong> with a score of <strong>${score}</strong>!</p><p>GREAT JOB!!!</p><p>How about another game?</p>`;
             }
             // if lives left
+
             if (livesLeft <= 3 && livesLeft > 0) {
                 // remove a life
                 livesLeft -=1;
+                // remove one heart image from the UI
                 heartElements.firstElementChild.remove();
+
+
+                // display a "warning" when the Player reaches their last life
                 if (livesLeft === 0) {
                     document.getElementsByTagName('canvas')[0].insertAdjacentHTML('afterEnd', "<p class='warning'>Careful, You Don't Have Any Lives Left To Spare!</p>");
-
                 }
             }
-            // reset character position
+
+            // reset Player pixel back to its starting position
             player.x = 220;
             player.y = 469;
         }
@@ -129,8 +136,8 @@ Entities.prototype.checkCollisions = function(x,y) {
 
 // Enemies our player must avoid
 class Enemy extends Entities {
-    // Variables applied to each of our instances go here,
-    // we've provided one for you to get started
+
+    //@@ Enemy Constructor needs the x and y coords as parameters
     constructor(x,y) {
         super(x,y);
         // The image/sprite for our enemies, this uses
@@ -158,13 +165,12 @@ Enemy.prototype.update = function(dt) {
     // which will ensure the game runs at the same speed for
     // all computers.
 
-    // Set the speed of enemy individually
+    // Set the speed of enemy everytime the cansvas updates
     this.x += (this.speed*65)*dt;
 
         // instead of just placing the enemy back at the left side of the screen
         // lets remove that bug and create an entirely new enemy with a
-        // different speed, and starting location on the canvas to make it
-        // harder
+        // different speed, and starting location on the canvas just for giggles
 
         // if an enemy leaves the canvas_right
        if (this.x > ctx.canvas.width) {
@@ -172,36 +178,29 @@ Enemy.prototype.update = function(dt) {
          allEnemies.forEach((enemy, idx) => {
              // determine which enemy in the array left the canvas
              if (this === enemy) {
-                 // remove this enemy from the array
+                 // Then remove this enemy from the array
                  allEnemies.splice(idx,1);
 
+                 // Now Let's make an entirely new enemy :D
+                 enemy.makeNewEnemy();
 
-                 // Then Let's make and entirely new enemy
-
-                 // randomly select a number between 1 and 3 to determine row placement
-                 let pickARow = (() => Math.floor(Math.random() * 3) + 1)();
-                 // determines Y coordinate according to what row was selected in pickARow
-                 this.y = (pickARow === 1? 135:pickARow===2?219:pickARow===3?303:null);
-                 // Make an entirely new enemy with these coords
-                 enemy = new Enemy(x=-100,this.y);
-
-
-                 // add this new enemy to the array where we removed the old
-                 // enemy
-                 allEnemies.splice( idx, 0, enemy);
              }
          });
        }
 
 };
 
+// Prototypical method that allows us to make a new enemy everytime the Player
+// levels up OR leaves the canvas-->right, increasing the difficulty level
 Enemy.prototype.makeNewEnemy = function() {
+    let enemyRows = [135,219,303]
     //randomly select where off screen to start the bug
     this.x = Math.floor(Math.random() * -100) - 100;
-    // randomly select a number between 1 and 3 to randomly determine row placement
-    let pickARow = (() => Math.floor(Math.random() * 3) + 1)();
+    // Select a number between 1 and 3 to randomly determine row placement
+    let pickARow = (() => Math.floor(Math.random() * 4) + 1)();
     // determines Y coordinate according to what row was selected in pickARow
-    this.y = (pickARow === 1? 135:pickARow===2?219:pickARow===3?303:null);
+    this.y = enemyRows[pickARow-1];
+    //this.y = (pickARow === 1? 135:pickARow===2?219:pickARow===3?303:null);
     // create a new enemy with these x and y coords
     enemy = new Enemy(this.x,this.y);
     // add this enemy to our enemy array
@@ -211,8 +210,8 @@ Enemy.prototype.makeNewEnemy = function() {
 
 // Place all enemy objects in an array called allEnemies
 const  allEnemies = [];
-// Randomly create 3 enemies and push them into the allEnemies array
-  for(var i=1; i< 4; i++) {
+// Randomly create 2 enemies and push them into the allEnemies array
+  for(var i=1; i< 3; i++) {
       //randomly select where off screen to start the bug
       this.x = Math.floor(Math.random() * -100) - 100;
       // randomly select a number between 1 and 3 to randomly determine row placement
@@ -252,6 +251,7 @@ class Player extends Entities {
         this.sHeight = 88; // actual height of sprite - inert transparencies
 
         this.lvl = 1; // Game levels player has completed
+        this.collisionSfx = new Audio('soundfx/cartoon-ouch-sound-effect-J0EbCeXN-clipped.mp3');
     }
 
 };
@@ -268,8 +268,23 @@ Player.prototype.levelup = function () {
         score += 1000;
         // display the score in the UI
         uiScore.innerText = score;
-        // Play lvlUp sfx
-        player.lvlUpSfx.play();
+
+        //@@**** Attribution: https://sweetalert2.github.io/ *****//
+        //@  This piece of code provides BLING in a simple modal alert
+        //@  everytime the player reaches the water as a level up notice
+        //@@**** Attribution: https://sweetalert2.github.io/ *****//
+        swal({
+            position: 'center',
+            title: `Level ${this.lvl}`,
+            showConfirmButton: false,
+            width: 300,
+            padding: '1em',
+            timer: 750
+            }).then((result) => {
+            result.dismiss === swal.DismissReason.timer
+        });
+        // ***** End Attribution *****//
+
         // to increase difficulty level, place another enemy on the board
         enemy.makeNewEnemy();
     }
@@ -334,10 +349,26 @@ document.addEventListener('keyup', function(e) {
 // setup evenlisteners for buttons on the modal
 document.querySelector('.modal').addEventListener('click', function(e) {
     if (e.target.matches('button#reset')) {
-        // just reload the page on play again or close. (simple reset)
+        // just reload the page on play again (simple reset)
         location.reload();
     }
     if (e.target.matches('button#close')) {
+        // Closes the browser window
         self.close();
+    }
+});
+
+document.querySelector('.infoBar').addEventListener('click', function (e) {
+    if (e.target.matches('.muted')) {
+        e.target.classList.toggle("muted");
+        e.target.classList.toggle("unmuted");
+            bgMusic.play();
+
+    } else {
+
+        e.target.classList.toggle("unmuted");
+        e.target.classList.toggle("muted");
+        bgMusic.pause();
+
     }
 })
