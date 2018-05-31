@@ -56,5 +56,5 @@ Attribution: "Morten Barfod Søegaard, Little Robot Sound Factory", [www.littler
 The Little Robot Sound Factory sound effects and music are released on Zapsplat.com under the Creative [Commons Attribution 4.0 International License](https://www.zapsplat.com/license-type/cc-attribution-4-0-international/)
 
 **Collecting Hearts (Extra Lives) Sfx**
-// Attribution: Sound effects obtained from https://www.zapsplat.com
+Attribution: Sound effects obtained from https://www.zapsplat.com
 [Standard License](https://www.zapsplat.com/license-type/standard-license/)
