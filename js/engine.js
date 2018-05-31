@@ -158,6 +158,10 @@ var Engine = (function(global) {
         });
 
         player.render();
+        treasure.forEach(function (loot) {
+            loot.render();
+        });
+
     }
 
     /* This function does nothing but it could have been a good place to
@@ -178,9 +182,14 @@ var Engine = (function(global) {
         'images/grass-block.png',
         'images/enemy-bug.png',
         'images/char-boy.png',
+        'images/Heart.png',
         'images/Heart2.png',
         'images/mute.png',
-        'images/unmute.png'
+        'images/unmute.png',
+        'images/Gem Blue.png',
+        'images/Gem Green.png',
+        'images/Gem Orange.png',
+        'images/Key.png'
     ]);
     Resources.onReady(init);
 

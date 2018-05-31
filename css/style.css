@@ -19,12 +19,12 @@ body {
 }
 
 .health {
-    width: 40%;
+    width: 50%;
 }
 
 
 .score {
-    width: 40%;
+    width: 30%;
 }
 
 
@@ -37,22 +37,22 @@ body {
 
 
 .muted {
-    width: 20%;
+    width: 10%;
     height: auto;
     background-image: url(../images/mute.png);
     background-repeat: no-repeat;
     background-size: contain;
-    background-position: center;
+    background-position: top center;
     z-index: 100;
 }
 
 .unmuted {
-    width: 20%;
+    width: 10%;
     height: auto;
     background-image: url(../images/unmute.png);
     background-repeat: no-repeat;
     background-size: contain;
-    background-position: center;
+    background-position: top center;
     z-index: 100;
 }
 
@@ -69,6 +69,12 @@ body {
     width: 505px;
     display: none;
     color: #000;
+}
+
+
+.modal p {
+    padding: 0em 2em;
+    font-size: 1.12em;
 }
 
 

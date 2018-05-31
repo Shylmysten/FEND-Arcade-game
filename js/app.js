@@ -1,5 +1,11 @@
-let score = 0;
-let livesLeft = 3;
+const gameData = {
+    score: 0,
+    livesLeft: 3,
+    gems: 0,
+    key: 0
+}
+
+
 
 // create a div to place our score and lives in
 const infoBar = document.createElement('div');
@@ -17,9 +23,14 @@ const pScore = document.createElement('div');
 pScore.setAttribute('class', 'score');
 // now lets place a score of 000000 into a span with the id of 'score'
 pScore.innerHTML = '<p>SCORE:<span type="number" id="score">000000</span></p>';
-
+// create a dive for our sfx controls
 const sfxControls = document.createElement('div');
+// give it a class attribute and set it to muted
 sfxControls.setAttribute('class', 'muted');
+/***** Attribution:
+Artist: YDoop
+Song: Splash
+Download/Stream: https://audiograb.com/HqL3mzLp */
 const bgMusic = new Audio('soundfx/splash-HqL3mzLp2.mp3');
 bgMusic.volume = .45;
 bgMusic.loop = true;
@@ -60,23 +71,24 @@ Entities.prototype.render = function() {
 //@@ Prototypical method which provied logic for collisions between
 // Player and enemies
 Entities.prototype.checkCollisions = function(x,y) {
+    // Player's left side
+    let pLeft = player.x;
+    // Players right side
+    let pRight = player.x + player.sWidth;
+    // Players top
+    let pTop = player.y;
+    // Players bottom
+    let pBottom = player.y + player.sHeight;
+
     allEnemies.forEach((enemy) => {
-        // Player's left side
-        let pLeft = player.x;
-        // Players right side
-        let pRight = player.x + player.sWidth;
-        // Players top
-        let pTop = player.y;
-        // Players bottom
-        let pBottom = player.y + player.sHeight;
         // Enemies left side
         let eLeft = enemy.x;
         // Enemies right side
         let eRight = enemy.x + enemy.sWidth;
         // top of our enemy
         let eTop = enemy.y;
-        // bottom of our enemy
-        let eBottom = enemy.y + enemy.sHeight;
+        // bottom of our enemy (-31 removes the shadow so its a real collision)
+        let eBottom = (enemy.y + enemy.sHeight) - 31;
 
         // Set the conditions for an actual collision between a player and enemy
         if (((pTop <= eBottom)&&(pBottom-player.sx>=eTop)) && ((pLeft+player.sx <= eRight)&&(pRight-player.sx >= eLeft))) {
@@ -86,7 +98,7 @@ Entities.prototype.checkCollisions = function(x,y) {
             // CHECK LIVES LEFT
 
             // if the player has no lives left
-            if (livesLeft === 0) {
+            if (gameData.livesLeft === 0) {
                 // GAME OVER display modal
                 bgMusic.pause();
                 // get and remove the low lives message displayed below canvas
@@ -106,21 +118,25 @@ Entities.prototype.checkCollisions = function(x,y) {
                 // display the overlay
                 overlay.style.display = "block";
                 // change the text of the header
-                header.innerHTML = `GAME OVER BUDDY!`;
+                header.innerHTML = `GAME OVER!`;
                 // change the message body of the modal
-                message.innerHTML = `<p>You reached <strong>Level ${this.lvl}</strong> with a score of <strong>${score}</strong>!</p><p>GREAT JOB!!!</p><p>How about another game?</p>`;
+                message.innerHTML = `
+                <p>Nice Job Champ!</p>
+                <p>You reached <strong>Level ${this.lvl}</strong>, collecting <strong>${gameData.gems} gems</strong> and <strong>${gameData.key} keys</strong> along the way, scoring a total of <strong>${gameData.score} points</strong>!!!</p>
+                <p>You're a Regular Hero!!!</p>
+                <p>How about another game?</p>`;
             }
             // if lives left
 
-            if (livesLeft <= 3 && livesLeft > 0) {
+            if (gameData.livesLeft > 0) {
                 // remove a life
-                livesLeft -=1;
+                gameData.livesLeft -= 1;
                 // remove one heart image from the UI
-                heartElements.firstElementChild.remove();
+                heartElements.removeChild(heartElements.firstElementChild);
 
 
                 // display a "warning" when the Player reaches their last life
-                if (livesLeft === 0) {
+                if (gameData.livesLeft === 1) {
                     document.getElementsByTagName('canvas')[0].insertAdjacentHTML('afterEnd', "<p class='warning'>Careful, You Don't Have Any Lives Left To Spare!</p>");
                 }
             }
@@ -131,6 +147,64 @@ Entities.prototype.checkCollisions = function(x,y) {
         }
     });
 
+    treasure.forEach((loot,idx) => {
+        // Treasure left side
+        let tLeft = loot.x;
+        // Trasure right side
+        let tRight = loot.x + loot.dWidth;
+        // top of our treasure
+        let tTop = loot.y;
+        // bottom of our treasure
+        let tBottom = loot.y + loot.dHeight
+
+        // Set the conditions for a collision between a player and Treasure
+        if (((pTop <= tBottom)&&(pBottom-player.sx>=tTop)) && ((pLeft+player.sx <= tRight)&&(pRight-player.sx >= tLeft))) {
+            // if the loot is a Gem
+            if (loot.sprite.includes('Gem')) {
+                // play the gem SFX
+                loot.getGemSfx.play();
+                // update how many gems have been picked up
+                gameData.gems += 1;
+                // increment our player's score
+                gameData.score += 250;
+                // update the score in the UI
+                uiScore.innerText = gameData.score;
+            }
+            // if the loot is a Key
+            if (loot.sprite.includes('Key')) {
+                // play the key SFX
+                loot.getKeySfx.play();
+                // update how many keys have been picked up
+                gameData.key += 1;
+                // increment our player's score
+                gameData.score += 750;
+                // update the score in the UI
+                uiScore.innerText = gameData.score;
+            }
+            // if the loot is a heart
+            if (loot.sprite.includes('Heart')) {
+                // play the extraLife SFX
+                loot.extraLifeSfx.play();
+                // increment how many lives the player has left
+                gameData.livesLeft +=1;
+                // create a new img element and store it in gainLife
+                let gainLife = document.createElement('img');
+                // give this new element a class attribute and set it to hearts
+                gainLife.setAttribute('class','hearts');
+                // give this new element a src attribute and point to the sprite
+                gainLife.setAttribute('src', 'images/Heart2.png');
+                // append this new element to the element stored in
+                // heartElements (<span.class.lives>)
+                heartElements.appendChild(gainLife);
+            }
+            // we need to remove this element from the array now because it was
+            // picked up by the player
+             treasure.splice(idx,1);
+
+
+        }
+
+    });
 }
 
 
@@ -152,7 +226,7 @@ class Enemy extends Entities {
         // actual height of sprite - inert transparencies (checkCollisions)
         this.sHeight = 77;
         // randomly set the speed of each enemy
-        this.speed = Math.floor(Math.random() * 3) + 1;
+        this.speed = Math.floor(Math.random() * 3)+1.15;
     }
 
 
@@ -164,9 +238,9 @@ Enemy.prototype.update = function(dt) {
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
     // all computers.
-
     // Set the speed of enemy everytime the cansvas updates
     this.x += (this.speed*65)*dt;
+
 
         // instead of just placing the enemy back at the left side of the screen
         // lets remove that bug and create an entirely new enemy with a
@@ -180,9 +254,8 @@ Enemy.prototype.update = function(dt) {
              if (this === enemy) {
                  // Then remove this enemy from the array
                  allEnemies.splice(idx,1);
-
                  // Now Let's make an entirely new enemy :D
-                 enemy.makeNewEnemy();
+                 Enemy.prototype.makeNewEnemy();
 
              }
          });
@@ -195,11 +268,11 @@ Enemy.prototype.update = function(dt) {
 Enemy.prototype.makeNewEnemy = function() {
     let enemyRows = [135,219,303]
     //randomly select where off screen to start the bug
-    this.x = Math.floor(Math.random() * -100) - 100;
-    // Select a number between 1 and 3 to randomly determine row placement
-    let pickARow = (() => Math.floor(Math.random() * 4) + 1)();
+    this.x = Math.floor(Math.random() * -50) - 100;
+    // Select a number >= 0 and <= 2 to randomly determine row placement
+    let pickARow = (() => Math.floor(Math.random() * 3))();
     // determines Y coordinate according to what row was selected in pickARow
-    this.y = enemyRows[pickARow-1];
+    this.y = enemyRows[pickARow];
     //this.y = (pickARow === 1? 135:pickARow===2?219:pickARow===3?303:null);
     // create a new enemy with these x and y coords
     enemy = new Enemy(this.x,this.y);
@@ -210,18 +283,9 @@ Enemy.prototype.makeNewEnemy = function() {
 
 // Place all enemy objects in an array called allEnemies
 const  allEnemies = [];
-// Randomly create 2 enemies and push them into the allEnemies array
+// Create 2 enemies
   for(var i=1; i< 3; i++) {
-      //randomly select where off screen to start the bug
-      this.x = Math.floor(Math.random() * -100) - 100;
-      // randomly select a number between 1 and 3 to randomly determine row placement
-      let pickARow = (() => Math.floor(Math.random() * 3) + 1)();
-      // determines Y coordinate according to what row was selected in pickARow
-      this.y = (pickARow === 1? 135:pickARow===2?219:pickARow===3?303:null);
-      // create a new enemy with these x and y coords
-      enemy = new Enemy(this.x,this.y);
-      // add this enemy to our enemy array
-      allEnemies.push(enemy);
+      Enemy.prototype.makeNewEnemy();
   }
 
 
@@ -251,7 +315,15 @@ class Player extends Entities {
         this.sHeight = 88; // actual height of sprite - inert transparencies
 
         this.lvl = 1; // Game levels player has completed
+
+        /***** Attribution:
+        Artist: SoundEffects
+        Sfx: Cartoon Ouch Sound Effect
+        Download/Stream: https://audiograb.com/J0EbCeXN
+        Artist's twittter: https://twitter.com/AudioGrip
+        Artist's GooglePlus: https://plus.google.com/u/0/+seandehler *****/
         this.collisionSfx = new Audio('soundfx/cartoon-ouch-sound-effect-J0EbCeXN-clipped.mp3');
+
     }
 
 };
@@ -265,10 +337,10 @@ Player.prototype.levelup = function () {
         this.x = 220;
         this.y = 469;
         // increment player score
-        score += 1000;
+        gameData.score += 1000;
         // display the score in the UI
-        uiScore.innerText = score;
-
+        uiScore.innerText = gameData.score;
+        Loot.prototype.createTreasure();
         //@@**** Attribution: https://sweetalert2.github.io/ *****//
         //@  This piece of code provides BLING in a simple modal alert
         //@  everytime the player reaches the water as a level up notice
@@ -290,7 +362,8 @@ Player.prototype.levelup = function () {
     }
 }
 
-// Update the Player's position, required method for game
+// Player's update prototype
+//@@ checks to see if the player reached the water and ployer/enemy collisions
 Player.prototype.update = function() {
         // check if the player reached the water
         player.levelup();
@@ -328,6 +401,140 @@ const player = new Player();
 
 
 
+
+class Loot extends Entities {
+
+    // @@ TREASURE CONSTRUCTOR
+    // @@ 11 parameters needed, all 9 for the canvats ctx.drawImage method,
+    // @@ plus the x and y coords on the canvas
+
+    constructor(sprite,x,y,sx,sy,sWidth,sHeight,dx,dy,dWidth,dHeight) {
+        super(x,y);
+        // The image/sprite for our enemies, this uses
+        // a helper we've provided to easily load images
+        this.sprite = sprite;
+
+        // Characters Location information
+        this.x = x; // collision left is x coordinate
+        this.y = y; // collision top is Y coordinate
+
+
+        // position image
+        this.sx = sx; // offsets left inert transparent space in image itself
+        this.sy = sy; // offsets top inert transparent space in image itself
+        this.sWidth = sWidth; // actual width of sprite - inert transparencies
+        this.sHeight = sHeight; // actual height of sprite - inert transparencies
+        this.dx = dx;
+        this.dy = dy;
+        this.dWidth = dWidth;
+        this.dHeight = dHeight;
+        /***** Attribution: https://freesound.org/people/matiasromero/
+        Creative Commons 0 license
+        CC0 1.0 Universal (CC0 1.0)
+        Public Domain Dedication
+        Matias Romero can be found at http://matiasromero.deviantart.com */
+        this.getGemSfx = new Audio('soundfx/36365__matiasromero__clareira-sininho.mp3');
+        /**** Attribution: "Morten Barfod Søegaard, Little Robot Sound Factory", www.littlerobotsoundfactory.com
+        The Little Robot Sound Factory sound effects and music are released on Zapsplat.com under the Creative Commons Attribution 4.0 International License: https://www.zapsplat.com/license-type/cc-attribution-4-0-international/
+        */
+        this.getKeySfx = new Audio ('soundfx/little_robot_sound_factory_fantasy_Pickup_Gold_02.mp3');
+        // Attribution: Sound effects obtained from https://www.zapsplat.com
+        // https://www.zapsplat.com/license-type/standard-license/
+        this.extraLifeSfx = new Audio ('soundfx/zapsplat_multimedia_game_one_up_extra_life_005.mp3');
+    }
+};
+
+// Method of Loot that randomly selects which loot to place on the game board
+// The method uses an Array of Sprites, xCoords, yCoords, and also establishes
+// each sprites implementation into the canvas's ctx method, given the standard
+// 9 parameters
+// @@ returns 11 parameters - all 9 used in the canvas ctx drawImage method
+// PLUS each piece of loots x and y coords
+Loot.prototype.selectLoot= function() {
+
+    const lootSprites = [
+            'images/Gem Blue.png',
+            'images/Gem Green.png',
+            'images/Gem Orange.png',
+            'images/Key.png',
+            'images/Heart.png'
+        ];
+    sprite = lootSprites[Math.floor(Math.random() * 5)];
+    let xCoords = [18,119,220,321,422];
+    let yCoords = [133,217,301];
+    x = xCoords[Math.floor(Math.random() * 5)];
+    y = yCoords[Math.floor(Math.random() * 3)];
+
+    if (sprite.includes('Gem')) {
+        sx = 3;
+        sy = 58;
+        sWidth = 95;
+        sHeight = 111;
+        dx = x-5;
+        dy = y;
+        dWidth = 73;
+        dHeight = 83;
+    }
+    if (sprite.includes('Key')) {
+        sx = 0;
+        sy = 57;
+        sWidth = 76;
+        sHeight = 129;
+        dx = x;
+        dy = y;
+        dWidth = 54;
+        dHeight = 83;
+    }
+    if (sprite.includes('Heart')) {
+        sx = 7;
+        sy = 48;
+        sWidth = 90;
+        sHeight = 90;
+        dx = x+5;
+        dy = y+15;
+        dWidth = 50;
+        dHeight = 50;
+    }
+
+    return [sprite, x, y, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight];
+}
+
+Loot.prototype.render = function() {
+    ctx.drawImage(Resources.get(this.sprite), this.sx, this.sy, this.sWidth, this.sHeight, this.dx, this.dy, this.dWidth, this.dHeight);
+}
+
+const  treasure = [];
+
+
+Loot.prototype.createTreasure = function () {
+    let num = (() => Math.floor(Math.random() * 2)+1)();
+    // make sure there is never more than 2 pieces of treasure on the map
+    if (treasure.length >= 2) {
+        return;
+    } else {
+        num = num-treasure.length;
+    }
+
+    // Create 2 pieces of Loot
+      for(var i=1; i<= num; i++) {
+          let loot = new Loot(...Loot.prototype.selectLoot());
+
+          // add this loot to our treasureChest array
+          treasure.push(loot);
+
+          // if loot occupies the same square
+          if ((treasure[0].y === loot.y) && (treasure.length > 1)) {
+              // remove this loot from the array
+              treasure.pop();
+              // decrement i in the for loop so we can create another one
+              i--;
+          }
+      }
+}
+Loot.prototype.createTreasure();
+
+
+
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
 document.addEventListener('keyup', function(e) {
@@ -346,7 +553,7 @@ document.addEventListener('keyup', function(e) {
 
 });
 
-// setup evenlisteners for buttons on the modal
+// setup eventlisteners for buttons on the modal
 document.querySelector('.modal').addEventListener('click', function(e) {
     if (e.target.matches('button#reset')) {
         // just reload the page on play again (simple reset)
@@ -358,16 +565,24 @@ document.querySelector('.modal').addEventListener('click', function(e) {
     }
 });
 
+// setup eventlisteners on the infoBar
 document.querySelector('.infoBar').addEventListener('click', function (e) {
+    // did the item clicked have a muted class in it?
     if (e.target.matches('.muted')) {
+        // toggle off muted class
         e.target.classList.toggle("muted");
+        // toggle on unmuted class
         e.target.classList.toggle("unmuted");
+        // play background music
             bgMusic.play();
 
     } else {
-
+        // if it doesn't have the muted class
+        // toggle off the unmuted class
         e.target.classList.toggle("unmuted");
+        // toggle on the muted class
         e.target.classList.toggle("muted");
+        // pause/stop the background music
         bgMusic.pause();
 
     }
