@@ -36,6 +36,8 @@ body {
 }
 
 
+/* muted and unmuted dynamically applied to our mute button */
+
 .muted {
     width: 10%;
     height: auto;
@@ -119,6 +121,8 @@ button:hover {
 }
 
 
+/* Class applied to dynamic text that appears below the canvas when player only has 1 life left */
+
 .warning {
     color: red;
     font-weight: bold;
@@ -126,7 +130,7 @@ button:hover {
 }
 
 
-/* Overrides of native classes in Sweetalert2 */
+/* Overrides these native classes in Sweetalert2 */
 
 .swal2-popup {
     background: #FFEB3B !important;

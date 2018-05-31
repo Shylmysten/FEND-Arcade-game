@@ -1,11 +1,11 @@
+// Score and livesLeft keep track of players lives available and points scored
+// Gems and keys keep track of how many the player collects during gameplay
 const gameData = {
     score: 0,
     livesLeft: 3,
     gems: 0,
     key: 0
 }
-
-
 
 // create a div to place our score and lives in
 const infoBar = document.createElement('div');
@@ -32,7 +32,9 @@ Artist: YDoop
 Song: Splash
 Download/Stream: https://audiograb.com/HqL3mzLp */
 const bgMusic = new Audio('soundfx/splash-HqL3mzLp2.mp3');
+// set background music volume to 45%
 bgMusic.volume = .45;
+// autoloop background music
 bgMusic.loop = true;
 
 
@@ -211,7 +213,8 @@ Entities.prototype.checkCollisions = function(x,y) {
 // Enemies our player must avoid
 class Enemy extends Entities {
 
-    //@@ Enemy Constructor needs the x and y coords as parameters
+    //@@ Enemy Constructor requires the starting x and y coords on the canvas
+    //@@ as parameters
     constructor(x,y) {
         super(x,y);
         // The image/sprite for our enemies, this uses
@@ -235,10 +238,8 @@ class Enemy extends Entities {
 // Update the enemy's position, required method for game
 // Parameter: dt, a time delta between ticks
 Enemy.prototype.update = function(dt) {
-    // You should multiply any movement by the dt parameter
-    // which will ensure the game runs at the same speed for
-    // all computers.
-    // Set the speed of enemy everytime the cansvas updates
+
+    // Set the speed of enemy everytime the canvas updates
     this.x += (this.speed*65)*dt;
 
 
@@ -290,13 +291,10 @@ const  allEnemies = [];
 
 
 
-// Now write your own player class
-// This class requires an update(), render() and
-// a handleInput() method.
 // Our player
 class Player extends Entities {
-    // Variables applied to each of our instances go here,
-    // we've provided one for you to get started
+    //@@ Player CONSTRUCTOR has 3 parameter defaults. The sprite, and starting
+    //@@ x and y coords on the canvas
     constructor(sprite = 'images/char-boy.png', x= 220, y=469) {
         super();
         // The image/sprite for our enemies, this uses
@@ -410,34 +408,41 @@ class Loot extends Entities {
 
     constructor(sprite,x,y,sx,sy,sWidth,sHeight,dx,dy,dWidth,dHeight) {
         super(x,y);
-        // The image/sprite for our enemies, this uses
-        // a helper we've provided to easily load images
+        // The image/sprite for our treasure, this uses
+        // a helper udacity provided in engine.js to easily load images
         this.sprite = sprite;
 
-        // Characters Location information
+        // Characters canvas Location
         this.x = x; // collision left is x coordinate
         this.y = y; // collision top is Y coordinate
 
 
-        // position image
+        // source image info
         this.sx = sx; // offsets left inert transparent space in image itself
         this.sy = sy; // offsets top inert transparent space in image itself
         this.sWidth = sWidth; // actual width of sprite - inert transparencies
         this.sHeight = sHeight; // actual height of sprite - inert transparencies
-        this.dx = dx;
-        this.dy = dy;
-        this.dWidth = dWidth;
-        this.dHeight = dHeight;
+        // info how/where to place image on canvas
+        this.dx = dx; // destination xOffset
+        this.dy = dy; // distination yOffset
+        this.dWidth = dWidth; // width we want images to appear on canvas
+        this.dHeight = dHeight; // height we want images to appear on canvas
+
+
         /***** Attribution: https://freesound.org/people/matiasromero/
         Creative Commons 0 license
         CC0 1.0 Universal (CC0 1.0)
         Public Domain Dedication
         Matias Romero can be found at http://matiasromero.deviantart.com */
         this.getGemSfx = new Audio('soundfx/36365__matiasromero__clareira-sininho.mp3');
+
+
         /**** Attribution: "Morten Barfod Søegaard, Little Robot Sound Factory", www.littlerobotsoundfactory.com
         The Little Robot Sound Factory sound effects and music are released on Zapsplat.com under the Creative Commons Attribution 4.0 International License: https://www.zapsplat.com/license-type/cc-attribution-4-0-international/
         */
         this.getKeySfx = new Audio ('soundfx/little_robot_sound_factory_fantasy_Pickup_Gold_02.mp3');
+
+
         // Attribution: Sound effects obtained from https://www.zapsplat.com
         // https://www.zapsplat.com/license-type/standard-license/
         this.extraLifeSfx = new Audio ('soundfx/zapsplat_multimedia_game_one_up_extra_life_005.mp3');
@@ -445,13 +450,13 @@ class Loot extends Entities {
 };
 
 // Method of Loot that randomly selects which loot to place on the game board
-// The method uses an Array of Sprites, xCoords, yCoords, and also establishes
+// This method uses an Array of Sprites, xCoords, yCoords, and also establishes
 // each sprites implementation into the canvas's ctx method, given the standard
 // 9 parameters
 // @@ returns 11 parameters - all 9 used in the canvas ctx drawImage method
-// PLUS each piece of loots x and y coords
+// PLUS each piece of loots x and y coords on the canvas
 Loot.prototype.selectLoot= function() {
-
+    // stores the paths to our treasure images
     const lootSprites = [
             'images/Gem Blue.png',
             'images/Gem Green.png',
@@ -459,12 +464,22 @@ Loot.prototype.selectLoot= function() {
             'images/Key.png',
             'images/Heart.png'
         ];
+
+    // select a random piece of treasure (it's image)
     sprite = lootSprites[Math.floor(Math.random() * 5)];
+    // stores available x coordinate locations for our treasure
     let xCoords = [18,119,220,321,422];
+    // stores available y coordinate locations for our treasure
     let yCoords = [133,217,301];
+    // selects a random x coordinate from our array
     x = xCoords[Math.floor(Math.random() * 5)];
+    // selects a random y coordinate from our array
     y = yCoords[Math.floor(Math.random() * 3)];
 
+    // since each image is different, we need to establish what the image is
+    // in order to determine how we will place it onto the canvas
+
+    // if our selecting treasure is a Gem
     if (sprite.includes('Gem')) {
         sx = 3;
         sy = 58;
@@ -475,6 +490,7 @@ Loot.prototype.selectLoot= function() {
         dWidth = 73;
         dHeight = 83;
     }
+    // if our selected treasure is a Key
     if (sprite.includes('Key')) {
         sx = 0;
         sy = 57;
@@ -485,6 +501,7 @@ Loot.prototype.selectLoot= function() {
         dWidth = 54;
         dHeight = 83;
     }
+    // if our selected treasure is a heart
     if (sprite.includes('Heart')) {
         sx = 7;
         sy = 48;
@@ -495,19 +512,24 @@ Loot.prototype.selectLoot= function() {
         dWidth = 50;
         dHeight = 50;
     }
-
+    // return an array of 11 parameters, all 9 ctx.drawImage parameters and our
+    // x and y coords where we want to place the treasure on the canvas
     return [sprite, x, y, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight];
 }
 
+// Our render prototype takes 9 parameters to draw the image on the canvas
 Loot.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.sx, this.sy, this.sWidth, this.sHeight, this.dx, this.dy, this.dWidth, this.dHeight);
 }
 
+// an array to store all our Loot in :D
 const  treasure = [];
 
-
+// a method of Loot to create our individual treasure items
 Loot.prototype.createTreasure = function () {
+    // Randomly select number 1 or 2
     let num = (() => Math.floor(Math.random() * 2)+1)();
+
     // make sure there is never more than 2 pieces of treasure on the map
     if (treasure.length >= 2) {
         return;
@@ -517,20 +539,23 @@ Loot.prototype.createTreasure = function () {
 
     // Create 2 pieces of Loot
       for(var i=1; i<= num; i++) {
+          // create a new piece of treasure from the 11 pieces of data returned
+          // by the Loot.prototype.selectLoot() method
           let loot = new Loot(...Loot.prototype.selectLoot());
 
-          // add this loot to our treasureChest array
+          // add this loot to our treasure array
           treasure.push(loot);
 
           // if loot occupies the same square
           if ((treasure[0].y === loot.y) && (treasure.length > 1)) {
               // remove this loot from the array
               treasure.pop();
-              // decrement i in the for loop so we can create another one
+              // decrement i in the for loop so we can create another one in a // different location
               i--;
           }
       }
 }
+
 Loot.prototype.createTreasure();
 
 
