@@ -1,3 +1,5 @@
+// Whole-script strict mode
+'use strict';
 // Score and livesLeft keep track of players lives available and points scored
 // Gems and keys keep track of how many the player collects during gameplay
 const gameData = {
@@ -263,15 +265,15 @@ Enemy.prototype.update = function(dt) {
 Enemy.prototype.makeNewEnemy = function() {
     let enemyRows = [135,219,303];
     //randomly select where off screen to start the bug
-    this.x = Math.floor(Math.random() * -50) - 100;
+    let x = Math.floor(Math.random() * -50) - 100;
     // Select a number >= 0 and <= 2 to randomly determine row placement
     let pickARow = Math.floor(Math.random() * 3);
     // determines Y coordinate according to what row was selected in pickARow
-    this.y = enemyRows[pickARow];
+    let y = enemyRows[pickARow];
 
     // create a new enemy with these x and y coords
     // add this enemy to our enemy array
-    allEnemies.push(new Enemy(this.x,this.y));
+    allEnemies.push(new Enemy(x,y));
 };
 
 
@@ -355,9 +357,9 @@ Player.prototype.levelup = function () {
 //@@ checks to see if the player reached the water and ployer/enemy collisions
 Player.prototype.update = function() {
         // check if the player reached the water
-        player.levelup();
+        this.levelup();
         // check for collisions between the player and the enemy
-        player.checkCollisions(this.x, this.y);
+        this.checkCollisions(this.x, this.y);
 };
 
 
@@ -444,55 +446,55 @@ Loot.prototype.selectLoot= function() {
         ];
 
     // select a random piece of treasure (it's image)
-    sprite = lootSprites[Math.floor(Math.random() * 5)];
+    this.sprite = lootSprites[Math.floor(Math.random() * 5)];
     // stores available x coordinate locations for our treasure
-    let xCoords = [18,119,220,321,422];
+    const xCoords = [18,119,220,321,422];
     // stores available y coordinate locations for our treasure
-    let yCoords = [133,217,301];
+    const yCoords = [133,217,301];
     // selects a random x coordinate from our array
-    x = xCoords[Math.floor(Math.random() * 5)];
+    this.x = xCoords[Math.floor(Math.random() * 5)];
     // selects a random y coordinate from our array
-    y = yCoords[Math.floor(Math.random() * 3)];
+    this.y = yCoords[Math.floor(Math.random() * 3)];
 
     // since each image is different, we need to establish what the image is
     // in order to determine how we will place it onto the canvas
 
     // if our selected treasure is a Gem
-    if (sprite.includes('Gem')) {
-        sx = 3;
-        sy = 58;
-        sWidth = 95;
-        sHeight = 111;
-        dx = x-5;
-        dy = y;
-        dWidth = 73;
-        dHeight = 83;
+    if (this.sprite.includes('Gem')) {
+        this.sx = 3;
+        this.sy = 58;
+        this.sWidth = 95;
+        this.sHeight = 111;
+        this.dx = this.x-5;
+        this.dy = this.y;
+        this.dWidth = 73;
+        this.dHeight = 83;
     }
     // if our selected treasure is a Key
-    if (sprite.includes('Key')) {
-        sx = 0;
-        sy = 57;
-        sWidth = 76;
-        sHeight = 129;
-        dx = x;
-        dy = y;
-        dWidth = 54;
-        dHeight = 83;
+    if (this.sprite.includes('Key')) {
+        this.sx = 0;
+        this.sy = 57;
+        this.sWidth = 76;
+        this.sHeight = 129;
+        this.dx = this.x;
+        this.dy = this.y;
+        this.dWidth = 54;
+        this.dHeight = 83;
     }
     // if our selected treasure is a heart
-    if (sprite.includes('Heart')) {
-        sx = 7;
-        sy = 48;
-        sWidth = 90;
-        sHeight = 90;
-        dx = x+5;
-        dy = y+15;
-        dWidth = 50;
-        dHeight = 50;
+    if (this.sprite.includes('Heart')) {
+        this.sx = 7;
+        this.sy = 48;
+        this.sWidth = 90;
+        this.sHeight = 90;
+        this.dx = this.x+5;
+        this.dy = this.y+15;
+        this.dWidth = 50;
+        this.dHeight = 50;
     }
     // return an array of 11 parameters, all 9 ctx.drawImage parameters and our
     // x and y coords where we want to place the treasure on the canvas
-    return [sprite, x, y, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight];
+    return [this.sprite, this.x, this.y, this.sx, this.sy, this.sWidth, this.sHeight, this.dx, this.dy, this.dWidth, this.dHeight];
 };
 
 // Our render prototype takes 9 parameters to draw the image on the canvas
@@ -501,7 +503,7 @@ Loot.prototype.render = function() {
 };
 
 // an array to store all our Loot in :D
-const  treasure = [];
+const treasure = [];
 
 // a method of Loot to create our individual treasure items
 Loot.prototype.createTreasure = function () {
@@ -534,7 +536,9 @@ Loot.prototype.createTreasure = function () {
       }
 };
 
-Loot.prototype.createTreasure();
+
+const loot = Loot.prototype.createTreasure;
+loot.call();
 
 
 
