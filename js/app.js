@@ -5,7 +5,7 @@ const gameData = {
     livesLeft: 3,
     gems: 0,
     key: 0
-}
+};
 
 // create a div to place our score and lives in
 const infoBar = document.createElement('div');
@@ -33,7 +33,7 @@ Song: Splash
 Download/Stream: https://audiograb.com/HqL3mzLp */
 const bgMusic = new Audio('soundfx/splash-HqL3mzLp2.mp3');
 // set background music volume to 45%
-bgMusic.volume = .45;
+bgMusic.volume = 0.45;
 // autoloop background music
 bgMusic.loop = true;
 
@@ -68,7 +68,7 @@ class Entities {
 
 Entities.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.sx, this.sy, this.sWidth, this.sHeight, this.x, this.y, this.sWidth, this.sHeight);
-}
+};
 
 //@@ Prototypical method which provied logic for collisions between
 // Player and enemies
@@ -157,7 +157,7 @@ Entities.prototype.checkCollisions = function(x,y) {
         // top of our treasure
         let tTop = loot.y;
         // bottom of our treasure
-        let tBottom = loot.y + loot.dHeight
+        let tBottom = loot.y + loot.dHeight;
 
         // Set the conditions for a collision between a player and Treasure
         if (((pTop <= tBottom)&&(pBottom-player.sx>=tTop)) && ((pLeft+player.sx <= tRight)&&(pRight-player.sx >= tLeft))) {
@@ -207,7 +207,7 @@ Entities.prototype.checkCollisions = function(x,y) {
         }
 
     });
-}
+};
 
 
 // Enemies our player must avoid
@@ -233,7 +233,7 @@ class Enemy extends Entities {
     }
 
 
-};
+}
 
 // Update the enemy's position, required method for game
 // Parameter: dt, a time delta between ticks
@@ -267,11 +267,11 @@ Enemy.prototype.update = function(dt) {
 // Prototypical method that allows us to make a new enemy everytime the Player
 // levels up OR leaves the canvas-->right, increasing the difficulty level
 Enemy.prototype.makeNewEnemy = function() {
-    let enemyRows = [135,219,303]
+    let enemyRows = [135,219,303];
     //randomly select where off screen to start the bug
     this.x = Math.floor(Math.random() * -50) - 100;
     // Select a number >= 0 and <= 2 to randomly determine row placement
-    let pickARow = (() => Math.floor(Math.random() * 3))();
+    let pickARow = Math.floor(Math.random() * 3);
     // determines Y coordinate according to what row was selected in pickARow
     this.y = enemyRows[pickARow];
     //this.y = (pickARow === 1? 135:pickARow===2?219:pickARow===3?303:null);
@@ -324,7 +324,7 @@ class Player extends Entities {
 
     }
 
-};
+}
 
 Player.prototype.levelup = function () {
     // if the player reaches the water
@@ -351,14 +351,14 @@ Player.prototype.levelup = function () {
             padding: '1em',
             timer: 750
             }).then((result) => {
-            result.dismiss === swal.DismissReason.timer
+            result.dismiss === swal.DismissReason.timer;
         });
         // ***** End Attribution *****//
 
         // to increase difficulty level, place another enemy on the board
         enemy.makeNewEnemy();
     }
-}
+};
 
 // Player's update prototype
 //@@ checks to see if the player reached the water and ployer/enemy collisions
@@ -367,7 +367,7 @@ Player.prototype.update = function() {
         player.levelup();
         // check for collisions between the player and the enemy
         player.checkCollisions(this.x, this.y);
-}
+};
 
 
 Player.prototype.handleInput = function(e) {
@@ -390,7 +390,7 @@ Player.prototype.handleInput = function(e) {
             ((this.y + 83) > 489) ? null:this.y = this.y + 84;
         }
 
-}
+};
 
 // Now instantiate your objects.
 
@@ -447,7 +447,7 @@ class Loot extends Entities {
         // https://www.zapsplat.com/license-type/standard-license/
         this.extraLifeSfx = new Audio ('soundfx/zapsplat_multimedia_game_one_up_extra_life_005.mp3');
     }
-};
+}
 
 // Method of Loot that randomly selects which loot to place on the game board
 // This method uses an Array of Sprites, xCoords, yCoords, and also establishes
@@ -515,12 +515,12 @@ Loot.prototype.selectLoot= function() {
     // return an array of 11 parameters, all 9 ctx.drawImage parameters and our
     // x and y coords where we want to place the treasure on the canvas
     return [sprite, x, y, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight];
-}
+};
 
 // Our render prototype takes 9 parameters to draw the image on the canvas
 Loot.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.sx, this.sy, this.sWidth, this.sHeight, this.dx, this.dy, this.dWidth, this.dHeight);
-}
+};
 
 // an array to store all our Loot in :D
 const  treasure = [];
@@ -554,7 +554,7 @@ Loot.prototype.createTreasure = function () {
               i--;
           }
       }
-}
+};
 
 Loot.prototype.createTreasure();
 
@@ -611,4 +611,4 @@ document.querySelector('.infoBar').addEventListener('click', function (e) {
         bgMusic.pause();
 
     }
-})
+});
