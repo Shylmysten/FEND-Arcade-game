@@ -27,10 +27,7 @@ pScore.innerHTML = '<p>SCORE:<span type="number" id="score">000000</span></p>';
 const sfxControls = document.createElement('div');
 // give it a class attribute and set it to muted
 sfxControls.setAttribute('class', 'muted');
-/***** Attribution:
-Artist: YDoop
-Song: Splash
-Download/Stream: https://audiograb.com/HqL3mzLp */
+// create a new audio object and place it into bgMusic
 const bgMusic = new Audio('soundfx/splash-HqL3mzLp2.mp3');
 // set background music volume to 45%
 bgMusic.volume = 0.45;
@@ -106,7 +103,7 @@ Entities.prototype.checkCollisions = function(x,y) {
                 // get and remove the low lives message displayed below canvas
                 document.querySelector('canvas').nextSibling.remove();
                 // hide the display while displaying the model
-                document.querySelector('canvas').style.display = "none";
+                document.querySelector('canvas').style.display = 'none';
                 // Select the modal
                 let modal = document.getElementsByClassName('modal')[0];
                 // Select the overlay behind the modal
@@ -116,9 +113,9 @@ Entities.prototype.checkCollisions = function(x,y) {
                 // select the ptag after the h2 tag
                 let message = header.nextElementSibling;
                 // display the modal
-                modal.style.display = "block";
+                modal.style.display = 'block';
                 // display the overlay
-                overlay.style.display = "block";
+                overlay.style.display = 'block';
                 // change the text of the header
                 header.innerHTML = `GAME OVER!`;
                 // change the message body of the modal
@@ -202,10 +199,7 @@ Entities.prototype.checkCollisions = function(x,y) {
             // we need to remove this element from the array now because it was
             // picked up by the player
              treasure.splice(idx,1);
-
-
         }
-
     });
 };
 
@@ -274,11 +268,10 @@ Enemy.prototype.makeNewEnemy = function() {
     let pickARow = Math.floor(Math.random() * 3);
     // determines Y coordinate according to what row was selected in pickARow
     this.y = enemyRows[pickARow];
-    //this.y = (pickARow === 1? 135:pickARow===2?219:pickARow===3?303:null);
+
     // create a new enemy with these x and y coords
-    enemy = new Enemy(this.x,this.y);
     // add this enemy to our enemy array
-    allEnemies.push(enemy);
+    allEnemies.push(new Enemy(this.x,this.y));
 };
 
 
@@ -286,7 +279,8 @@ Enemy.prototype.makeNewEnemy = function() {
 const  allEnemies = [];
 // Create 2 enemies
   for(var i=1; i< 3; i++) {
-      Enemy.prototype.makeNewEnemy();
+      const enemy = Enemy.prototype.makeNewEnemy;
+      enemy.call();
   }
 
 
@@ -314,12 +308,7 @@ class Player extends Entities {
 
         this.lvl = 1; // Game levels player has completed
 
-        /***** Attribution:
-        Artist: SoundEffects
-        Sfx: Cartoon Ouch Sound Effect
-        Download/Stream: https://audiograb.com/J0EbCeXN
-        Artist's twittter: https://twitter.com/AudioGrip
-        Artist's GooglePlus: https://plus.google.com/u/0/+seandehler *****/
+        // create a new Audio object and store it in collisionSfx
         this.collisionSfx = new Audio('soundfx/cartoon-ouch-sound-effect-J0EbCeXN-clipped.mp3');
 
     }
@@ -328,9 +317,9 @@ class Player extends Entities {
 
 Player.prototype.levelup = function () {
     // if the player reaches the water
-    if (player.y <= 50) {
+    if (this.y <= 50) {
         // increment player level
-        player.lvl += 1;
+        this.lvl += 1;
         // reset player to bottom of the board
         this.x = 220;
         this.y = 469;
@@ -338,6 +327,7 @@ Player.prototype.levelup = function () {
         gameData.score += 1000;
         // display the score in the UI
         uiScore.innerText = gameData.score;
+        // add new treasure to the canvas
         Loot.prototype.createTreasure();
         //@@**** Attribution: https://sweetalert2.github.io/ *****//
         //@  This piece of code provides BLING in a simple modal alert
@@ -356,7 +346,8 @@ Player.prototype.levelup = function () {
         // ***** End Attribution *****//
 
         // to increase difficulty level, place another enemy on the board
-        enemy.makeNewEnemy();
+        const enemy = Enemy.prototype.makeNewEnemy;
+        enemy.call();
     }
 };
 
@@ -427,24 +418,11 @@ class Loot extends Entities {
         this.dy = dy; // distination yOffset
         this.dWidth = dWidth; // width we want images to appear on canvas
         this.dHeight = dHeight; // height we want images to appear on canvas
-
-
-        /***** Attribution: https://freesound.org/people/matiasromero/
-        Creative Commons 0 license
-        CC0 1.0 Universal (CC0 1.0)
-        Public Domain Dedication
-        Matias Romero can be found at http://matiasromero.deviantart.com */
+        // create new Audio object with our Gem collection sound fx
         this.getGemSfx = new Audio('soundfx/36365__matiasromero__clareira-sininho.mp3');
-
-
-        /**** Attribution: "Morten Barfod Søegaard, Little Robot Sound Factory", www.littlerobotsoundfactory.com
-        The Little Robot Sound Factory sound effects and music are released on Zapsplat.com under the Creative Commons Attribution 4.0 International License: https://www.zapsplat.com/license-type/cc-attribution-4-0-international/
-        */
+        // create new Audio object with our Key collection sound fx
         this.getKeySfx = new Audio ('soundfx/little_robot_sound_factory_fantasy_Pickup_Gold_02.mp3');
-
-
-        // Attribution: Sound effects obtained from https://www.zapsplat.com
-        // https://www.zapsplat.com/license-type/standard-license/
+        // create new Audio object with our gain an extra life sound fx
         this.extraLifeSfx = new Audio ('soundfx/zapsplat_multimedia_game_one_up_extra_life_005.mp3');
     }
 }
@@ -479,7 +457,7 @@ Loot.prototype.selectLoot= function() {
     // since each image is different, we need to establish what the image is
     // in order to determine how we will place it onto the canvas
 
-    // if our selecting treasure is a Gem
+    // if our selected treasure is a Gem
     if (sprite.includes('Gem')) {
         sx = 3;
         sy = 58;
@@ -586,7 +564,7 @@ document.querySelector('.modal').addEventListener('click', function(e) {
     }
     if (e.target.matches('button#close')) {
         // Closes the browser window
-        self.close();
+        window.close();
     }
 });
 

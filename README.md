@@ -12,6 +12,8 @@ I took a few liberties at improvisation by not only adding a score and visual re
 ## How To Play
 
 Simply point your browser to https://shylmysten.github.io/FEND-Arcade-game/
+or clone this repository: https://github.com/Shylmysten/FEND-Arcade-game.git
+or you can download the entire game to your computer in a [zip file](https://github.com/Shylmysten/FEND-Arcade-game/archive/master.zip). Unzip the contents and navigate to the directory you unzipped the file in, and open the index.html file in your browser
 
  - When the page finishes loading, the game is ready to play
  - The object is to reach the water without being hit by any bugs.
